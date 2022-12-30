@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Observer_Design_Pattern.DAL.Entities;
 using Observer_Design_Pattern.Models;
+using Observer_Design_Pattern.ObserverDesignPattern;
 using System.Threading.Tasks;
 
 namespace Observer_Design_Pattern.Controllers
@@ -9,9 +10,11 @@ namespace Observer_Design_Pattern.Controllers
     public class DefaultController : Controller
     {
         private readonly UserManager<AppUser> _userManager;
-        public DefaultController(UserManager<AppUser> userManager)
+        private readonly UserObserverObject _userObserverObject;
+        public DefaultController(UserManager<AppUser> userManager, UserObserverObject userObserverObject)
         {
             _userManager = userManager;
+            _userObserverObject = userObserverObject;
         }
 
 
@@ -37,6 +40,7 @@ namespace Observer_Design_Pattern.Controllers
             var result = await _userManager.CreateAsync(appuser, model.Password);
             if (result.Succeeded)
             {
+                _userObserverObject.NotifyObserver(appuser);
                 ViewBag.Message = "Üyelik başarıyla oluşturuldu";
             }
             else

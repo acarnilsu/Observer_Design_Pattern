@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Observer_Design_Pattern.DAL;
+using Observer_Design_Pattern.DAL.Entities;
+using Observer_Design_Pattern.ObserverDesignPattern;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +26,17 @@ namespace Observer_Design_Pattern
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<UserObserverObject>(sp =>
+            {
+                UserObserverObject userObserverObject = new();
+                userObserverObject.RegisterObserver(new UserObserverWriterToConsole(sp));
+                userObserverObject.RegisterObserver(new UserObserverCreateDiscount(sp));
+                userObserverObject.RegisterObserver(new UserObserverSendEmail(sp));
+                return userObserverObject;
+            });
+
+            services.AddDbContext<Context>();
+            services.AddIdentity<AppUser, AppRole>().AddEntityFrameworkStores<Context>();
             services.AddControllersWithViews();
         }
 
